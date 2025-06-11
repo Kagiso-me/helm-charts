@@ -1,2 +1,2 @@
-# helm-charts-private-
+# helm-charts
 private repo
