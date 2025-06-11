@@ -648,7 +648,7 @@ primary:
     ## @param primary.service.type MariaDB Primary Kubernetes service type
     ##
     type: ClusterIP
-    ports:
+    ports: 
       ## @param primary.service.ports.mysql MariaDB Primary Kubernetes service port for MariaDB
       ##
       mysql: 3306
