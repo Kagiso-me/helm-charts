@@ -10,8 +10,8 @@ image:
   # pullSecrets:
   #   - myRegistrKeySecretName
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: "nextcloud"
+fullnameOverride: "nextcloud"
 podAnnotations: {}
 deploymentAnnotations: {}
 deploymentLabels: {}
@@ -80,7 +80,7 @@ nextcloud:
   ## Use an existing secret
   existingSecret:
     enabled: true
-    # secretName: nameofsecret
+    secretName: nextcloud-secret
     usernameKey: nextcloud-username
     passwordKey: nextcloud-password
     tokenKey: ""
@@ -97,21 +97,21 @@ nextcloud:
   trustedDomains: 
     cloud.kagiso.me
     cloud.local.kagiso.me
-    10.0.10.17
+    10.0.10.18
   ## SMTP configuration
   mail:
-    enabled: false
+    enabled: true
     # the user we send email as
-    fromAddress: user
+    fromAddress: Nextcloud
     # the domain we send email from
-    domain: domain.com
+    domain: outlook.com
     smtp:
-      host: domain.com
+      host: smtp-mail.outlook.com
       secure: ssl
       port: 465
       authtype: LOGIN
-      name: user
-      password: pass
+      name: smtp-username
+      password: smtp-password
   ## Primary ObjectStore options
   # see: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage
   objectStore:
@@ -183,7 +183,7 @@ nextcloud:
 
   ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
-  phpConfigs: {}
+  phpConfigs: 
   ## Default config files that utilize environment variables:
   # see: https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables
   # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself
@@ -212,7 +212,7 @@ nextcloud:
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
     # -- imaginary support config
-    imaginary.config.php: false
+    imaginary.config.php: true
 
   # Extra config files created in /var/www/html/config/
   # ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
@@ -284,14 +284,14 @@ nextcloud:
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
   extraVolumes:
-  #  - name: nfs
-  #    nfs:
-  #      server: "10.0.0.1"
-  #      path: "/nextcloud_data"
-  #      readOnly: false
+    - name: nfs
+      nfs:
+        server: "10.0.10.5"
+        path: "/mnt/Gitmo/k3s"
+        readOnly: false
   extraVolumeMounts:
-  #  - name: nfs
-  #    mountPath: "/legacy_data"
+    - name: nfs
+      mountPath: "/nextcloud-data"
 
   # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
   # For example, you may need to define runAsNonRoot directive
@@ -376,15 +376,16 @@ nginx:
   #    value: ENV_VALUE
 
 internalDatabase:
-  enabled: true
+  enabled: false
   name: nextcloud
 
 ##
 ## External database configuration
 ##
 externalDatabase:
-  enabled: false
-
+  enabled: true
+  ## Use an existing database, e.g. a MariaDB or PostgreSQL database
+  ## If you want to deploy a database from the bitnami mariadb or postgresql chart, set mariadb.enabled or postgresql.enabled to true
   ## Supported database engines: mysql or postgresql
   type: mysql
 
@@ -402,12 +403,12 @@ externalDatabase:
 
   ## Use a existing secret
   existingSecret:
-    enabled: false
-    # secretName: nameofsecret
+    enabled: true
+    secretName: mariadb-secret
     usernameKey: db-username
     passwordKey: db-password
-    # hostKey: db-hostname-or-ip
-    # databaseKey: db-name
+    hostKey: db-ip
+    databaseKey: db-name-nextcloud
 
 ##
 ## MariaDB chart configuration
@@ -417,12 +418,12 @@ mariadb:
   ## Whether to deploy a mariadb server from the bitnami mariab db helm chart
   # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
-  enabled: false
+  enabled: true
 
   # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
   global:
     # overwrites the primary.persistence.storageClass value
-    defaultStorageClass: ""
+    defaultStorageClass: "longhorn"
 
   auth:
     database: nextcloud
@@ -430,7 +431,8 @@ mariadb:
     password: changeme
     # Use existing secret (auth.rootPassword, auth.password, and auth.replicationPassword will be ignored).
     # secret must contain the keys mariadb-root-password, mariadb-replication-password and mariadb-password
-    existingSecret: ""
+    existingSecret: "mariadb-secret"
+  # Name of existing secret to use for MariaDB credentials.
 
   architecture: standalone
 
@@ -439,12 +441,12 @@ mariadb:
   ##
   primary:
     persistence:
-      enabled: false
+      enabled: true
       # Use an existing Persistent Volume Claim (must be created ahead of time)
       existingClaim: ""
-      storageClass: ""
-      accessMode: ReadWriteOnce
-      size: 8Gi
+      storageClass: "longhorn"
+      accessMode: ReadWriteMany
+      size: 10Gi
 
 ##
 ## PostgreSQL chart configuration
@@ -482,30 +484,30 @@ postgresql:
 ##
 
 redis:
-  enabled: false
+  enabled: true
   auth:
     enabled: true
     password: 'changeme'
     # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
-    existingSecret: ""
+    existingSecret: "nextcloud-secret"
     # Password key to be retrieved from existing secret
-    existingSecretPasswordKey: ""
+    existingSecretPasswordKey: "redis-password"
   # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
   global:
-    storageClass: ""
+    storageClass: "longhorn"
   master:
     persistence:
       enabled: true
   replica:
     persistence:
-      enabled: true
+      enabled: false
 
 ##
 ## Collabora chart configuration
 ## for more options see https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online
 ##
 collabora:
-  enabled: false
+  enabled: true
 
   autoscaling:
     # enable autocaling, please check collabora README.md first
@@ -518,7 +520,7 @@ collabora:
 
     # set extra parameters for collabora
     # you may need to add --o:ssl.termination=true
-    extra_params: --o:ssl.enable=false
+    extra_params: --o:ssl.enable=true
 
     ## Specify server_name when the hostname is not reachable directly for
     # example behind reverse-proxy. example: collabora.domain
@@ -527,11 +529,11 @@ collabora:
     existingSecret:
       # set to true to to get collabora admin credentials from an existin secret
       # if set, ignores collabora.collabora.username and password
-      enabled: false
+      enabled: true
       # name of existing Kubernetes Secret with collboara admin credentials
-      secretName: ""
-      usernameKey: "username"
-      passwordKey: "password"
+      secretName: "nextcloud-secret"
+      usernameKey: "collabora-username"
+      passwordKey: "collabora-password"
 
     # setup admin login credentials, these are ignored if
     # collabora.collabora.existingSecret.enabled=true
@@ -556,19 +558,31 @@ collabora:
     #      - collabora.domain
 
   # see collabora helm README.md for recommended values
-  resources: {}
+  resources: 
+    limits:
+      cpu: 1.5
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
 
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
 ##
 cronjob:
-  enabled: false
+  enabled: true
 
   ## Cronjob sidecar resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
+  resources: 
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi  
 
   # Allow configuration of lifecycle hooks
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
@@ -587,9 +601,9 @@ cronjob:
   - /cron.sh
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 8080
-  loadBalancerIP: ""
+  loadBalancerIP: "10.0.10.18"
   nodePort:
   # -- use additional annotation on service for nextcloud
   annotations: {}
@@ -599,7 +613,7 @@ service:
 ##
 persistence:
   # Nextcloud Data (/var/www/html)
-  enabled: false
+  enabled: true
   annotations: {}
   ## nextcloud data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -615,8 +629,8 @@ persistence:
   ## If defined, PVC must be created manually before volume will be bound
   # existingClaim:
 
-  accessMode: ReadWriteOnce
-  size: 8Gi
+  accessMode: ReadWriteMany
+  size: 30Gi
 
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
@@ -629,17 +643,17 @@ persistence:
     accessMode: ReadWriteOnce
     size: 8Gi
 
-resources: {}
+resources: 
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
 
 ## Liveness and readiness probe values
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
@@ -671,7 +685,7 @@ startupProbe:
 ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 ##
 hpa:
-  enabled: false
+  enabled: true
   cputhreshold: 60
   minPods: 1
   maxPods: 10
@@ -691,7 +705,7 @@ dnsConfig: {}
 
 imaginary:
   # -- Start Imgaginary
-  enabled: false
+  enabled: true
   # -- Number of imaginary pod replicas to deploy
   replicaCount: 1
 
@@ -717,7 +731,13 @@ imaginary:
   tolerations: []
 
   # -- imaginary resources
-  resources: {}
+  resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
 
   # -- Optional security context for the Imaginary container
   securityContext:
@@ -762,7 +782,7 @@ imaginary:
 ## Prometheus Exporter / Metrics
 ##
 metrics:
-  enabled: false
+  enabled: true
 
   replicaCount: 1
   # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
@@ -776,11 +796,11 @@ metrics:
   token: ""
   timeout: 5s
   # if set to true, exporter skips certificate verification of Nextcloud server.
-  tlsSkipVerify: false
+  tlsSkipVerify: true
   info:
     # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
     # Enables gathering of apps-related metrics. Defaults to false
-    apps: false
+    apps: true
 
   image:
     repository: xperimental/nextcloud-exporter
@@ -792,7 +812,13 @@ metrics:
   ## Metrics exporter resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
+  resources: 
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
 
   # -- Metrics exporter pod Annotation
   podAnnotations: {}
@@ -810,7 +836,7 @@ metrics:
   affinity: {}
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     # Use serviceLoadBalancerIP to request a specific static IP,
     # otherwise leave blank
     loadBalancerIP:
@@ -839,28 +865,28 @@ metrics:
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
-    enabled: false
+    enabled: true
 
     ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
     ##
-    namespace: ""
+    namespace: "monitoring"
 
     ## @param metrics.serviceMonitor.namespaceSelector The selector of the namespace where the target service is located (defaults to the release namespace)
     namespaceSelector:
 
     ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in prometheus.
     ##
-    jobLabel: ""
+    jobLabel: "nextcloud"
 
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
     ##
-    interval: 30s
+    interval: 20s
 
     ## @param metrics.serviceMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
     ##
-    scrapeTimeout: ""
+    scrapeTimeout: "15s"
 
     ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
     ##
@@ -868,7 +894,7 @@ metrics:
 
 
 rbac:
-  enabled: false
+  enabled: true
   serviceaccount:
     create: true
     name: nextcloud-serviceaccount
