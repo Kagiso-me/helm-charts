@@ -1,0 +1,5 @@
+owner: Kagiso-me
+git-repo: helm-charts
+charts-dir: charts
+release-name-template: "{{ .Name }}-{{ .Version }}"
+index-path: index.yaml
