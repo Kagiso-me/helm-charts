@@ -36,10 +36,10 @@ global:
 kubeVersion: ""
 ## @param nameOverride String to partially override mariadb.fullname
 ##
-nameOverride: ""
+nameOverride: "mariadb"
 ## @param fullnameOverride String to fully override mariadb.fullname
 ##
-fullnameOverride: ""
+fullnameOverride: "mariadb"
 ## @param clusterDomain Default Kubernetes cluster domain
 ##
 clusterDomain: cluster.local
