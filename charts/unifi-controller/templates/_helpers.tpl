@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "unifi-controller.name" -}}
+{{- define "unifi.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "unifi-controller.fullname" -}}
+{{- define "unifi.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "unifi-controller.chart" -}}
+{{- define "unifi.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "unifi-controller.labels" -}}
-helm.sh/chart: {{ include "unifi-controller.chart" . }}
-{{ include "unifi-controller.selectorLabels" . }}
+{{- define "unifi.labels" -}}
+helm.sh/chart: {{ include "unifi.chart" . }}
+{{ include "unifi.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "unifi-controller.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "unifi-controller.name" . }}
+{{- define "unifi.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "unifi.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "unifi-controller.serviceAccountName" -}}
+{{- define "unifi.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "unifi-controller.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "unifi.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

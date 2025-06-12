@@ -1,16 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "unifi-controller.fullname" . }}
+  name: {{ include "unifi.fullname" . }}
+  namespace: {{ .Release.Namespace }}  
   labels:
-    {{- include "unifi-controller.labels" . | nindent 4 }}
+    {{- include "unifi.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      {{- include "unifi-controller.selectorLabels" . | nindent 6 }}
+      {{- include "unifi.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,52 +17,98 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "unifi-controller.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "unifi.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "unifi-controller.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
+      serviceAccountName: {{ include "unifi.serviceAccountName" . }}
       securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: TZ
+            value: {{ .Values.environment.timezone }}
+          - name: PUID
+            value: "{{ .Values.environment.uid }}"
+          - name: PGID
+            value: "{{ .Values.environment.gid }}"
+          - name: MEM_LIMIT
+            value: "{{ .Values.environment.memLimit }}"
+          - name: MEM_STARTUP
+            value: "{{ .Values.environment.memStartup }}"
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
+          - containerPort: 8080
+            protocol: TCP
+            name: devicecom
+          - containerPort: 8443
+            protocol: TCP
+            name: webapi
+          - containerPort: 8880
+            protocol: TCP
+            name: httpredirects
+          - containerPort: 8843
+            protocol: TCP
+            name: httpsredirects
+          - containerPort: 6789
+            protocol: TCP
+            name: speedtest
+          - containerPort: 10001
+            protocol: UDP
+            name: apdiscovery
+          - containerPort: 3478
+            protocol: TCP
+            name: stun
+          {{- if .Values.service.appDiscovery }}
+          - containerPort: 1900
+            protocol: UDP
+            name: appdiscovery
           {{- end }}
-          {{- with .Values.readinessProbe }}
+          {{- if .Values.service.syslogCapture }}
+          - containerPort: 5514
+            protocol: UDP
+            name: syslogcapture    
+          {{- end }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.resources }}
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20                     
           resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.volumeMounts }}
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
+            - mountPath: "/config"
+              name: data
+            - mountPath: "/config/data/backup"              
+              name: backup-data
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "unifi.fullname" . }}-data
+        {{- else }}
+        - name: data
+          emptyDir: {}
+        {{- end }}           
+        {{- if .Values.persistence.backup.enabled }}
+        - name: backup-data
+          persistentVolumeClaim:
+            claimName: {{ include "unifi.fullname" . }}-backup
+        {{- else }}        
+        - name: backup-data
+          emptyDir: {}
+        {{- end }}            
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -76,3 +121,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
