@@ -10,8 +10,8 @@ image:
   # pullSecrets:
   #   - myRegistrKeySecretName
 
-nameOverride: "nextcloud"
-fullnameOverride: "nextcloud"
+nameOverride: ""
+fullnameOverride: ""
 podAnnotations: {}
 deploymentAnnotations: {}
 deploymentLabels: {}
