@@ -115,12 +115,12 @@ jellyfin:
       labels: {}
       annotations: {}
     media:
-      enabled: false
+      enabled: true
       storageClass: "longhorn"
-      existingClaim: "jellyfin-media"
+      existingClaim: "jellyfin-nfs-pvc"
       subPath: ""
       accessMode: ReadWriteMany
-      size: 10Gi
+      size: 1Ti
       labels: {}
       annotations: {}
 
@@ -145,15 +145,15 @@ jellyfin:
 
   affinity: {}
 
-  extraVolumes:
-    - name: nfs-media
-      persistentVolumeClaim:
-        claimName: jellyfin-nfs-pvc
+#  extraVolumes:
+#    - name: nfs-media
+#      persistentVolumeClaim:
+#        claimName: jellyfin-nfs-pvc
 
-  extraVolumeMounts: 
-    - name: nfs-media
-      mountPath: /mnt/Gitmo/Media
-      readOnly: false
+#  extraVolumeMounts: 
+#    - name: nfs-media
+#      mountPath: /mnt/Gitmo/Media
+#      readOnly: false
 
   extraEnvVars: []
     #- name: MY_ENV_VAR
