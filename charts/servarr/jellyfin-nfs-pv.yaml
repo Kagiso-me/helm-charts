@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-nfs-pv
+spec:
+  capacity:
+    storage: 1Ti  # Arbitrary, just needs to match PVC
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.0.10.5
+    path: /mnt/Gitmo/Media

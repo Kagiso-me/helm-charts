@@ -78,10 +78,10 @@ jellyfin:
     tag: "10.10.1"
     pullPolicy: IfNotPresent
 
-  enableDLNA: false
+  enableDLNA: true
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 8096
     nodePort: ""
     annotations: {}
@@ -107,19 +107,19 @@ jellyfin:
   persistence:
     config:
       enabled: true
-      storageClass: ""
+      storageClass: "longhorn"
       existingClaim: ""
       subPath: ""
-      accessMode: ReadWriteOnce
-      size: 1Gi
+      accessMode: ReadWriteMany
+      size: 4Gi
       labels: {}
       annotations: {}
     media:
-      enabled: true
-      storageClass: ""
-      existingClaim: ""
+      enabled: false
+      storageClass: "longhorn"
+      existingClaim: "jellyfin-media"
       subPath: ""
-      accessMode: ReadWriteOnce
+      accessMode: ReadWriteMany
       size: 10Gi
       labels: {}
       annotations: {}
@@ -131,13 +131,13 @@ jellyfin:
       #   existingClaim:
       #   readOnly: true
 
-  resources: {}
-    # limits:
-    #  cpu: 100m
-    #  memory: 128Mi
-    # requests:
-    #  cpu: 100m
-    #  memory: 128Mi
+  resources: 
+   limits:
+     cpu: 2000m
+     memory: 2Gi
+   requests:
+       cpu: 500m
+       memory: 512Mi
 
   nodeSelector: {}
 
@@ -145,14 +145,15 @@ jellyfin:
 
   affinity: {}
 
-  extraVolumes: []
-    #- name: renderD129
-    #  hostPath:
-    #    path: /dev/dri/renderD129
+  extraVolumes:
+    - name: nfs-media
+      persistentVolumeClaim:
+        claimName: jellyfin-nfs-pvc
 
-  extraVolumeMounts: []
-    #- mountPath: /dev/dri/renderD129
-    #  name: renderD129
+  extraVolumeMounts: 
+    - name: nfs-media
+      mountPath: /mnt/Gitmo/Media
+      readOnly: true
 
   extraEnvVars: []
     #- name: MY_ENV_VAR
@@ -176,7 +177,7 @@ jellyfin:
     #     - "ALL"
 
   livenessProbe:
-    enabled: false
+    enabled: true
     failureThreshold: 3
     initialDelaySeconds: 10
     periodSeconds: 10
@@ -184,7 +185,7 @@ jellyfin:
     timeoutSeconds: 1
 
   readinessProbe:
-    enabled: false
+    enabled: true
     failureThreshold: 3
     initialDelaySeconds: 10
     periodSeconds: 10
@@ -267,7 +268,7 @@ sonarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "sonarr"
 
   podAnnotations: {}
 
@@ -289,7 +290,7 @@ sonarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 80
     nodePort: ""
 
@@ -309,13 +310,13 @@ sonarr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
   autoscaling:
     enabled: false
@@ -333,16 +334,16 @@ sonarr:
   env:
     PUID: "1000"
     PGID: "1000"
-    TZ: "Europe/London"
+    TZ: "Africa/Johannesburg"
     UMASK: "002"
 
   persistence:
     enabled: true
     path: tv
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -414,7 +415,7 @@ qbittorrent:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "qbittorrent"
 
   podAnnotations: {}
 
@@ -436,11 +437,11 @@ qbittorrent:
 
   service:
     web:
-      type: ClusterIP
+      type: LoadBalancer
       port: 8080
       nodePort: ""
     bt:
-      type: ClusterIP
+      type: LoadBalancer
       port: 6881
       nodePort: ""
 
@@ -460,13 +461,13 @@ qbittorrent:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   autoscaling:
     enabled: false
@@ -484,15 +485,15 @@ qbittorrent:
   env:
     PUID: "1000"
     PGID: "1000"
-    TZ: "Europe/London"
+    TZ: "Africa/Johannebsurg"
 
   persistence:
     enabled: true
     path: downloads
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -561,7 +562,7 @@ prowlarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "prowlarr"
 
   podAnnotations: {}
 
@@ -583,7 +584,7 @@ prowlarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 9696
     nodePort: ""
 
@@ -603,13 +604,13 @@ prowlarr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   autoscaling:
     enabled: false
@@ -627,15 +628,15 @@ prowlarr:
   env:
     PUID: "1000"
     PGID: "1000"
-    TZ: "Europe/London"
+    TZ: "Africa/Johannesburg"
     UMASK: "002"
 
   persistence:
     enabled: true
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -684,7 +685,7 @@ prowlarr:
 ## @param flaresolverr.affinity The affinity to use for the pod.
 ##
 flaresolverr:
-  enabled: true
+  enabled: false
   replicaCount: 1
 
   image:
@@ -830,7 +831,7 @@ jellyseerr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "jellyseerr"
 
   podAnnotations: {}
 
@@ -852,7 +853,7 @@ jellyseerr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 5055
     nodePort: ""
 
@@ -872,13 +873,13 @@ jellyseerr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: 
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   autoscaling:
     enabled: false
@@ -895,10 +896,10 @@ jellyseerr:
 
   persistence:
     enabled: true
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -949,7 +950,7 @@ jellyseerr:
 ## @param bazarr.persistence.additionalMounts Additional volume mounts to add to the pod.
 ##
 bazarr:
-  enabled: true
+  enabled: false
   replicaCount: 1
 
   image:
@@ -987,7 +988,7 @@ bazarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 6767
     nodePort: ""
 
@@ -1108,7 +1109,7 @@ radarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "radarr"
 
   podAnnotations: {}
 
@@ -1129,7 +1130,7 @@ radarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 7878
     nodePort: ""
 
@@ -1149,13 +1150,13 @@ radarr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
   autoscaling:
     enabled: false
@@ -1173,16 +1174,16 @@ radarr:
   env:
     PUID: "1000"
     PGID: "1000"
-    TZ: "Europe/London"
+    TZ: "Africa/Johannesburg"
     UMASK: "002"
 
   persistence:
     enabled: true
     path: movies
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1252,7 +1253,7 @@ lidarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "lidarr"
 
   podAnnotations: {}
 
@@ -1273,7 +1274,7 @@ lidarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 8686
     nodePort: ""
 
@@ -1293,13 +1294,13 @@ lidarr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
   autoscaling:
     enabled: false
@@ -1323,10 +1324,10 @@ lidarr:
   persistence:
     enabled: true
     path: music
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
-    accessMode: ReadWriteOnce
-    size: 800Mi
+    accessMode: ReadWriteMany
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1396,7 +1397,7 @@ readarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "readarr"
 
   podAnnotations: {}
 
@@ -1418,7 +1419,7 @@ readarr:
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     port: 8787
     nodePort: ""
 
@@ -1438,13 +1439,13 @@ readarr:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
   autoscaling:
     enabled: false
@@ -1462,16 +1463,16 @@ readarr:
   env:
     PUID: "1000"
     PGID: "1000"
-    TZ: "Europe/London"
+    TZ: "Africa/Johannesburg"
     UMASK: "002"
 
   persistence:
     enabled: true
     path: books
-    storageClass: ""
+    storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteOnce
-    size: 800Mi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1594,7 +1595,7 @@ readarr:
 ## @param cleanuperr.persistence.logs.additionalMounts Additional volume mounts to add to the pod.
 ##
 cleanuperr:
-  enabled: false
+  enabled: true
   replicaCount: 1
 
   image:
@@ -1611,7 +1612,7 @@ cleanuperr:
   serviceAccount:
     create: true
     annotations: {}
-    name: ""
+    name: "cleanuperr"
 
   podAnnotations: {}
 
@@ -1631,13 +1632,13 @@ cleanuperr:
     #   image: busybox
     #   command: ['sh', '-c', 'echo "this is an init container"']
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: 
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   autoscaling:
     enabled: false
@@ -1653,21 +1654,21 @@ cleanuperr:
   affinity: {}
 
   secrets:
-    existingSecret: ""
+    existingSecret: "servarr-secret"
     qbittorrent:
-      username: ""
-      password: ""
+      username: "qbittorrent-username"
+      password: "qbittorrent-password"
     sonarr:
-      apiKey: ""
+      apiKey: "sonarr-api-key"
     radarr:
-      apiKey: ""
+      apiKey: "radarr-api-key"
     lidarr:
-      apiKey: ""
+      apiKey: "llidarr-api-key"
 
   env:
     # General Settings
-    TZ: "Europe/London"
-    DRY_RUN: false
+    TZ: "Africa/Johannesburg"
+    DRY_RUN: true
     LOGGING__LOGLEVEL: "Information"
     LOGGING__FILE__ENABLED: true
     LOGGING__FILE__PATH: "/var/logs"
@@ -1760,10 +1761,10 @@ cleanuperr:
 
   persistence:
     logs:
-      enabled: false
-      storageClass: ""
+      enabled: true
+      storageClass: "longhorn"
       existingClaim: ""
-      accessMode: ReadWriteOnce
-      size: 100Mi
+      accessMode: ReadWriteMany
+      size: 2Gi
       additionalVolumes: []
       additionalMounts: []
