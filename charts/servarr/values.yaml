@@ -343,7 +343,7 @@ sonarr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -493,7 +493,7 @@ qbittorrent:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -636,7 +636,7 @@ prowlarr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -899,7 +899,7 @@ jellyseerr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1183,7 +1183,7 @@ radarr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1327,7 +1327,7 @@ lidarr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteMany
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1472,7 +1472,7 @@ readarr:
     storageClass: "longhorn"
     existingClaim: ""
     accessMode: ReadWriteOnce
-    size: 2Gi
+    size: 4Gi
     additionalVolumes: []
     additionalMounts: []
 
@@ -1765,6 +1765,6 @@ cleanuperr:
       storageClass: "longhorn"
       existingClaim: ""
       accessMode: ReadWriteMany
-      size: 2Gi
+      size: 4Gi
       additionalVolumes: []
       additionalMounts: []
