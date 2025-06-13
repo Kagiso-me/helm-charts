@@ -17,8 +17,8 @@ global:
   ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
 ## @param global.storageClass DEPRECATED: use global.defaultStorageClass instead
   ##
-  defaultStorageClass: ""
-  storageClass: ""
+  defaultStorageClass: "longorn"
+  storageClass: "longhorn"
   postgresql:
     ## @param global.postgresql.auth.postgresPassword Password for the "postgres" admin user (overrides `auth.postgresPassword`)
     ## @param global.postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
@@ -34,11 +34,11 @@ global:
       username: ""
       password: ""
       database: ""
-      existingSecret: ""
+      existingSecret: "mariadb-secret"
       secretKeys:
-        adminPasswordKey: ""
-        userPasswordKey: ""
-        replicationPasswordKey: ""
+        adminPasswordKey: "rootPassword"
+        userPasswordKey: "password"
+        replicationPasswordKey: "rootPassword"
     ## @param global.postgresql.service.ports.postgresql PostgreSQL service port (overrides `service.ports.postgresql`)
     ##
     service:
@@ -154,15 +154,15 @@ auth:
   replicationPassword: ""
   ## @param auth.existingSecret Name of existing secret to use for PostgreSQL credentials. `auth.postgresPassword`, `auth.password`, and `auth.replicationPassword` will be ignored and picked up from this secret. The secret might also contains the key `ldap-password` if LDAP is enabled. `ldap.bind_password` will be ignored and picked from this secret in this case.
   ##
-  existingSecret: ""
+  existingSecret: "mariadb-secret"
   ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
   ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
   ## @param auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
   ##
   secretKeys:
-    adminPasswordKey: postgres-password
+    adminPasswordKey: rootPassword
     userPasswordKey: password
-    replicationPasswordKey: replication-password
+    replicationPasswordKey: rootPassword
   ## @param auth.usePasswordFiles Mount credentials as a files instead of using an environment variable
   ##
   usePasswordFiles: false
@@ -639,7 +639,7 @@ primary:
   ## @param primary.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `primary.pdb.minAvailable` and `primary.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## @param primary.extraPodSpec Optionally specify extra PodSpec for the PostgreSQL Primary pod(s)
@@ -792,14 +792,14 @@ primary:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ""
+    storageClass: "longhorn"
     ## @param primary.persistence.accessModes PVC Access Mode for PostgreSQL volume
     ##
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
-    size: 8Gi
+    size: 5Gi
     ## @param primary.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
@@ -821,7 +821,7 @@ primary:
   persistentVolumeClaimRetentionPolicy:
     ## @param primary.persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Primary Statefulset
     ##
-    enabled: false
+    enabled: true
     ## @param primary.persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
     ##
     whenScaled: Retain
@@ -836,7 +836,7 @@ readReplicas:
   name: read
   ## @param readReplicas.replicaCount Number of PostgreSQL read only replicas
   ##
-  replicaCount: 1
+  replicaCount: 0
   ## @param readReplicas.extendedConfiguration Extended PostgreSQL read only replicas configuration (appended to main or default configuration)
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#allow-settings-to-be-loaded-from-files-other-than-the-default-postgresqlconf
   ##
@@ -1093,7 +1093,7 @@ readReplicas:
   ## @param readReplicas.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `readReplicas.pdb.minAvailable` and `readReplicas.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## @param readReplicas.extraPodSpec Optionally specify extra PodSpec for the PostgreSQL read only pod(s)
