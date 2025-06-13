@@ -97,7 +97,7 @@ nextcloud:
   trustedDomains: 
     cloud.kagiso.me
     cloud.local.kagiso.me
-    10.0.10.18
+    10.0.10.29
   ## SMTP configuration
   mail:
     enabled: true
