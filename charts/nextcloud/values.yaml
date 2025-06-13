@@ -507,7 +507,7 @@ redis:
 ## for more options see https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online
 ##
 collabora:
-  enabled: true
+  enabled: false
 
   autoscaling:
     # enable autocaling, please check collabora README.md first
