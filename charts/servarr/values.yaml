@@ -1380,7 +1380,7 @@ lidarr:
 ## @param readarr.persistence.additionalMounts Additional volume mounts to add to the pod.
 ##
 readarr:
-  enabled: true
+  enabled: false
   replicaCount: 1
 
   image:
