@@ -494,14 +494,14 @@ master:
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
     ##
-    storageClass: ""
+    storageClass: "longhorn"
     ## @param master.persistence.accessModes Persistent Volume access modes
     ##
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     ## @param master.persistence.size Persistent Volume size
     ##
-    size: 8Gi
+    size: 4Gi
     ## @param master.persistence.annotations Additional custom annotations for the PVC
     ##
     annotations: {}
@@ -642,7 +642,7 @@ replica:
   kind: StatefulSet
   ## @param replica.replicaCount Number of Redis&reg; replicas to deploy
   ##
-  replicaCount: 3
+  replicaCount: 1
   ## @param replica.revisionHistoryLimit The number of old history to retain to allow rollback
   ## NOTE: Explicitly setting this field to 0, will result in cleaning up all the history, breaking ability to rollback
   revisionHistoryLimit: 10
