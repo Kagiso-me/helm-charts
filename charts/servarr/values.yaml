@@ -111,11 +111,11 @@ jellyfin:
       existingClaim: ""
       subPath: ""
       accessMode: ReadWriteMany
-      size: 4Gi
+      size: 5Gi
       labels: {}
       annotations: {}
     media:
-      enabled: true
+      enabled: false
       storageClass: "longhorn"
       existingClaim: "jellyfin-nfs-pvc"
       subPath: ""
