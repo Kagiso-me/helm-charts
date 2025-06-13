@@ -1,0 +1,23 @@
+image:
+  repository: lscr.io/linuxserver/sabnzbd
+  tag: "4.5.1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 8080
+
+env:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "Africa/Johannesburg"
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: sabnzbd-config-pvc
+  downloads:
+    enabled: true
+    nfs:
+      server: 10.0.10.5
+      path: /mnt/Gitmo/Downloads
