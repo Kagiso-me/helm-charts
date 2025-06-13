@@ -603,7 +603,7 @@ cronjob:
 service:
   type: LoadBalancer
   port: 8080
-  loadBalancerIP: "10.0.10.18"
+  loadBalancerIP: ""
   nodePort:
   # -- use additional annotation on service for nextcloud
   annotations: {}
