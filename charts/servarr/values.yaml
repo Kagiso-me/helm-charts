@@ -1656,8 +1656,8 @@ cleanuperr:
   secrets:
     existingSecret: "servarr-secret"
     qbittorrent:
-      username: "qbittorrent-username"
-      password: "qbittorrent-password"
+      username: "QBITTORRENT__USERNAME"
+      password: "QBITTORRENT__PASSWORD"
     sonarr:
       apiKey: "sonarr-api-key"
     radarr:
