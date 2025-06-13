@@ -268,7 +268,7 @@ sonarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "sonarr"
+    name: ""
 
   podAnnotations: {}
 
@@ -415,7 +415,7 @@ qbittorrent:
   serviceAccount:
     create: true
     annotations: {}
-    name: "qbittorrent"
+    name: ""
 
   podAnnotations: {}
 
@@ -562,7 +562,7 @@ prowlarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "prowlarr"
+    name: ""
 
   podAnnotations: {}
 
@@ -831,7 +831,7 @@ jellyseerr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "jellyseerr"
+    name: ""
 
   podAnnotations: {}
 
@@ -1109,7 +1109,7 @@ radarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "radarr"
+    name: ""
 
   podAnnotations: {}
 
@@ -1253,7 +1253,7 @@ lidarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "lidarr"
+    name: ""
 
   podAnnotations: {}
 
@@ -1397,7 +1397,7 @@ readarr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "readarr"
+    name: ""
 
   podAnnotations: {}
 
@@ -1612,7 +1612,7 @@ cleanuperr:
   serviceAccount:
     create: true
     annotations: {}
-    name: "cleanuperr"
+    name: ""
 
   podAnnotations: {}
 
