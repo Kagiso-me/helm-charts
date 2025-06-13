@@ -19,6 +19,8 @@ env:
   # -- Set the container timezone
   TZ: UTC+2
   # HOST_WHITELIST_ENTRIES:
+  PUID=1000
+  PGID=1000
 
 # -- Configures service settings for the chart.
 # @default -- See values.yaml
@@ -40,6 +42,8 @@ persistence:
   config:
     enabled: true
     size: 2Gi
+    storageClass: "longhorn"
+    accessMode: ReadWriteMany
     
   media:
     enabled: false
