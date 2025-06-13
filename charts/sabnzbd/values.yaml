@@ -39,8 +39,7 @@ ingress:
 persistence:
   config:
     enabled: true
-    mountPath: /config
-    size: 1Gi
+    size: 2Gi
     
   media:
     enabled: false
