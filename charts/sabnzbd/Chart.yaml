@@ -1,25 +1,20 @@
-annotations:
-  artifacthub.io/changes: |-
-    - kind: changed
-      description: Upgraded `common` chart dependency to version 4.5.2
 apiVersion: v2
-appVersion: v3.3.1
+appVersion: 3.1.0
 dependencies:
 - name: common
-  repository: https://library-charts.k8s-at-home.com
-  version: 4.5.2
+  repository: https://k8s-at-home.com/charts/
+  version: 1.6.2
 description: Free and easy binary newsreader
-home: https://github.com/k8s-at-home/charts/tree/master/charts/stable/sabnzbd
+home: https://github.com/k8s-at-home/charts/tree/master/charts/sabnzbd
 icon: https://avatars1.githubusercontent.com/u/960698?s=400&v=4
 keywords:
 - sabnzbd
 - usenet
-kubeVersion: '>=1.16.0-0'
 maintainers:
 - email: jeff@billimek.com
   name: billimek
 name: sabnzbd
 sources:
+- https://hub.docker.com/r/linuxserver/sabnzbd/
 - https://sabnzbd.org/
-- https://github.com/k8s-at-home/container-images
-version: 9.4.2
+version: 3.6.1

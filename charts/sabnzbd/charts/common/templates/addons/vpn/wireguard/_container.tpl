@@ -4,37 +4,32 @@ The Wireguard sidecar container to be inserted.
 {{- define "common.addon.wireguard.container" -}}
 name: wireguard
 image: "{{ .Values.addons.vpn.wireguard.image.repository }}:{{ .Values.addons.vpn.wireguard.image.tag }}"
-imagePullPolicy: {{ .Values.addons.vpn.wireguard.pullPolicy }}
+imagePullPolicy: {{ .Values.addons.vpn.imagePullPolicy }}
 {{- with .Values.addons.vpn.securityContext }}
 securityContext:
   {{- toYaml . | nindent 2 }}
 {{- end }}
 {{- with .Values.addons.vpn.env }}
 env:
-  {{- . | toYaml | nindent 2 }}
+{{- range $k, $v := . }}
+  - name: {{ $k }}
+    value: {{ $v | quote }}
 {{- end }}
-{{- with .Values.addons.vpn.envFrom }}
-envFrom:
-  {{- . | toYaml | nindent 2 }}
 {{- end }}
-{{- with .Values.addons.vpn.args }}
-args:
-  {{- . | toYaml | nindent 2 }}
-{{- end }}
-{{- if or .Values.addons.vpn.configFile .Values.addons.vpn.configFileSecret .Values.addons.vpn.scripts.up .Values.addons.vpn.scripts.down .Values.addons.vpn.additionalVolumeMounts .Values.persistence.shared.enabled }}
+{{- if or .Values.addons.vpn.configFile .Values.addons.vpn.scripts.up .Values.addons.vpn.scripts.down .Values.addons.vpn.additionalVolumeMounts .Values.persistence.shared.enabled }}
 volumeMounts:
-{{- if or .Values.addons.vpn.configFile .Values.addons.vpn.configFileSecret }}
+{{- if .Values.addons.vpn.configFile }}
   - name: vpnconfig
     mountPath: /etc/wireguard/wg0.conf
     subPath: vpnConfigfile
 {{- end }}
 {{- if .Values.addons.vpn.scripts.up }}
-  - name: vpnscript
+  - name: vpnconfig
     mountPath: /config/up.sh
     subPath: up.sh
 {{- end }}
 {{- if .Values.addons.vpn.scripts.down }}
-  - name: vpnscript
+  - name: vpnconfig
     mountPath: /config/down.sh
     subPath: down.sh
 {{- end }}

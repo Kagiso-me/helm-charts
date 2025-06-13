@@ -1,118 +1,78 @@
-# sabnzbd
+# Sabnzbd
 
-![Version: 9.4.2](https://img.shields.io/badge/Version-9.4.2-informational?style=flat-square) ![AppVersion: v3.3.1](https://img.shields.io/badge/AppVersion-v3.3.1-informational?style=flat-square)
-
-Free and easy binary newsreader
+This is a helm chart for [Sabnzbd](https://github.com/sabnzbd/sabnzbd).
 
 **This chart is not maintained by the upstream project and any issues with the chart should be raised [here](https://github.com/k8s-at-home/charts/issues/new/choose)**
 
-## Source Code
+## TL;DR;
 
-* <https://sabnzbd.org/>
-* <https://github.com/k8s-at-home/container-images>
-
-## Requirements
-
-Kubernetes: `>=1.16.0-0`
-
-## Dependencies
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://library-charts.k8s-at-home.com | common | 4.5.2 |
-
-## TL;DR
-
-```console
-helm repo add k8s-at-home https://k8s-at-home.com/charts/
-helm repo update
-helm install sabnzbd k8s-at-home/sabnzbd
+```shell
+$ helm repo add k8s-at-home https://k8s-at-home.com/charts/
+$ helm install k8s-at-home/sabnzbd
 ```
 
 ## Installing the Chart
 
-To install the chart with the release name `sabnzbd`
+To install the chart with the release name `my-release`:
 
 ```console
-helm install sabnzbd k8s-at-home/sabnzbd
+helm install --name my-release k8s-at-home/sabnzbd
 ```
 
 ## Uninstalling the Chart
 
-To uninstall the `sabnzbd` deployment
+To uninstall/delete the `my-release` deployment:
 
 ```console
-helm uninstall sabnzbd
+helm delete my-release --purge
 ```
 
-The command removes all the Kubernetes components associated with the chart **including persistent volumes** and deletes the release.
+The command removes all the Kubernetes components associated with the chart and deletes the release.
 
 ## Configuration
+Read through the charts [values.yaml](https://github.com/k8s-at-home/charts/blob/master/charts/sabnzbd/values.yaml)
+file. It has several commented out suggested values.
+Additionally you can take a look at the common library [values.yaml](https://github.com/k8s-at-home/charts/blob/master/charts/common/values.yaml) for more (advanced) configuration options.
 
-Read through the [values.yaml](./values.yaml) file. It has several commented out suggested values.
-Other values may be used from the [values.yaml](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common/values.yaml) from the [common library](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common).
-
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
-
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 ```console
 helm install sabnzbd \
-  --set env.TZ="America/New York" \
+  --set env.TZ="America/New_York" \
     k8s-at-home/sabnzbd
 ```
-
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
-
+Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the
+chart. For example,
 ```console
-helm install sabnzbd k8s-at-home/sabnzbd -f values.yaml
+helm install sabnzbd k8s-at-home/sabnzbd --values values.yaml 
 ```
 
-## Custom configuration
+```yaml
+image:
+  tag: ...
+```
 
-**IMPORTANT NOTE:** when installing this chart for the first time you will get the follow message in your browser when trying to access Sabnzbd: `Access denied - Hostname verification failed: sabnzbd.org/hostname-check`
+---
+**NOTE**
 
-To address this issue, you can set an environment variable named `HOST_WHITELIST_ENTRIES` with the host(s) you would like added to the `host_whitelist` in the `sabnzbd.ini`
+If you get
+```console
+Error: rendered manifests contain a resource that already exists. Unable to continue with install: existing resource conflict: ...`
+```
+it may be because you uninstalled the chart with `skipuninstall` enabled, you need to manually delete the pvc or use `existingClaim`.
 
-## Values
+---
 
-**Important**: When deploying an application Helm chart you can add more values from our common library chart [here](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common)
+## Upgrading an existing Release to a new major version
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| env | object | See below | environment variables. |
-| env.TZ | string | `"UTC"` | Set the container timezone |
-| image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
-| image.repository | string | `"ghcr.io/k8s-at-home/sabnzbd"` | image repository |
-| image.tag | string | `"v3.3.1"` | image tag |
-| ingress.main | object | See values.yaml | Enable and configure ingress settings for the chart under this key. |
-| persistence | object | See values.yaml | Configure persistence settings for the chart under this key. |
-| service | object | See values.yaml | Configures service settings for the chart. |
+A major chart version change (like 4.0.1 -> 5.0.0) indicates that there is an incompatible breaking change potentially needing manual actions.
 
-## Changelog
+### Upgrading from 2.x.x to 3.x.x
 
-### Version 9.4.2
+Due to migrating to a centralized common library some values in `values.yaml` have changed.
 
-#### Added
+Examples:
 
-N/A
+* `service.port` has been moved to `service.port.port`.
+* `persistence.type` has been moved to `controllerType`.
 
-#### Changed
-
-* Upgraded `common` chart dependency to version 4.5.2
-
-#### Fixed
-
-N/A
-
-### Older versions
-
-A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/sabnzbd?modal=changelog)
-
-## Support
-
-- See the [Docs](https://docs.k8s-at-home.com/our-helm-charts/getting-started/)
-- Open an [issue](https://github.com/k8s-at-home/charts/issues/new/choose)
-- Ask a [question](https://github.com/k8s-at-home/organization/discussions)
-- Join our [Discord](https://discord.gg/sTMX7Vh) community
-
-----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v0.1.1](https://github.com/k8s-at-home/helm-docs/releases/v0.1.1)
+Refer to the library values.yaml for more configuration options.
