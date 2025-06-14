@@ -115,7 +115,7 @@ jellyfin:
       labels: {}
       annotations: {}
     media:
-      enabled: false
+      enabled: true
       storageClass: "longhorn"
       existingClaim: "jellyfin-nfs-pvc"
       subPath: ""
@@ -332,8 +332,8 @@ sonarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannesburg"
     UMASK: "002"
 
@@ -483,8 +483,8 @@ qbittorrent:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannebsurg"
 
   persistence:
@@ -626,8 +626,8 @@ prowlarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannesburg"
     UMASK: "002"
 
@@ -1030,8 +1030,8 @@ bazarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Europe/London"
 
   persistence:
@@ -1172,8 +1172,8 @@ radarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannesburg"
     UMASK: "002"
 
@@ -1316,8 +1316,8 @@ lidarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannesburg"
     UMASK: "002"
 
@@ -1461,8 +1461,8 @@ readarr:
   affinity: {}
 
   env:
-    PUID: "1000"
-    PGID: "1000"
+    PUID: "3000"
+    PGID: "3000"
     TZ: "Africa/Johannesburg"
     UMASK: "002"
 
