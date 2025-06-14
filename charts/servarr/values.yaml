@@ -124,11 +124,11 @@ jellyfin:
       labels: {}
       annotations: {}
 
-    extraExistingClaimMounts: []
+    extraExistingClaimMounts: 
       # - name: external-mount
       #   mountPath: /srv/external-mount
       ## If defined, a manually managed PVC must be created before volume binding
-      #   existingClaim:
+      existingClaim: "jellyfin-nfs-pvc"
       #   readOnly: true
 
   resources: 
