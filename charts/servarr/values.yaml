@@ -115,7 +115,7 @@ jellyfin:
       labels: {}
       annotations: {}
     media:
-      enabled: true
+      enabled: false
       storageClass: "longhorn"
       existingClaim: "jellyfin-nfs-pvc"
       subPath: ""
@@ -128,7 +128,7 @@ jellyfin:
       # - name: external-mount
       #   mountPath: /srv/external-mount
       ## If defined, a manually managed PVC must be created before volume binding
-      existingClaim: "jellyfin-nfs-pvc"
+      #existingClaim: "jellyfin-nfs-pvc"
       #   readOnly: true
 
   resources: 
