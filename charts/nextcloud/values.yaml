@@ -97,7 +97,7 @@ nextcloud:
   trustedDomains: 
     cloud.kagiso.me
     cloud.local.kagiso.me
-    10.0.10.29
+    10.0.10.20
   ## SMTP configuration
   mail:
     enabled: true
@@ -284,29 +284,29 @@ nextcloud:
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
   extraVolumes:
-  #  - name: nfs
-  #    nfs:
-  #      server: "10.0.10.5"
-  #      path: "/mnt/Gitmo/k3s"
-  #      readOnly: false
+    - name: nfs
+      nfs:
+        server: "10.0.10.5"
+        path: "/Gitmo/Documents/kagiso"
+        readOnly: false
   extraVolumeMounts:
-  #  - name: nfs
-  #    mountPath: "/nextcloud-data"
+    - name: nfs
+      mountPath: "/nextcloud-data"
 
   # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
   # For example, you may need to define runAsNonRoot directive
-  securityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: false
+  securityContext:
+    runAsUser: 3000
+    runAsGroup: 3000
+    runAsNonRoot: true
+    readOnlyRootFilesystem: false
 
   # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
-  podSecurityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: false
+  podSecurityContext: 
+    runAsUser: 3000
+    runAsGroup: 3000
+    runAsNonRoot: true
+    readOnlyRootFilesystem: false
 
   # Settings for the MariaDB init container
   mariaDbInitContainer:
@@ -603,7 +603,7 @@ cronjob:
 service:
   type: LoadBalancer
   port: 8080
-  loadBalancerIP: ""
+  loadBalancerIP: "10.0.10.20"
   nodePort:
   # -- use additional annotation on service for nextcloud
   annotations: {}
