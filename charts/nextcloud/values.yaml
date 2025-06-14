@@ -630,18 +630,18 @@ persistence:
   # existingClaim:
 
   accessMode: ReadWriteMany
-  size: 40Gi
+  size: 5Gi
 
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
-    enabled: false
-    subPath:
+    enabled: true
+    subPath: "/nextcloud-data"
     annotations: {}
-    # storageClass: "-"
+    storageClass: "longhorn"
     # existingClaim:
-    accessMode: ReadWriteOnce
-    size: 4Gi
+    accessMode: ReadWriteMany
+    size: 40Gi
 
 resources: 
   # We usually recommend not to specify default resources and to leave this as a conscious
