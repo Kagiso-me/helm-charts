@@ -636,7 +636,7 @@ persistence:
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
     enabled: true
-    subPath: "/nextcloud-data"
+    subPath: "/data"
     annotations: {}
     storageClass: "longhorn"
     # existingClaim:
